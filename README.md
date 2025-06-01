@@ -1,9 +1,4 @@
 # Laporan Proyek Machine Learning - Mafrukhif Dzulfahmil Nur
-## Domain Proyek
-
-**Kategori**
-
-**Rubrik / Kriteria Penilaian (Wajib)**
 
 ---
 
