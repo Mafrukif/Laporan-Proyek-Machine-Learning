@@ -2,12 +2,6 @@
 
 ---
 
-**Kategori**
-
-**Rubrik / Kriteria Penilaian (Wajib)**
-
----
-
 ## Domain Proyek
 
 ### Latar Belakang
