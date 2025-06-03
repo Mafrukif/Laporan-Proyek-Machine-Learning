@@ -2,6 +2,12 @@
 
 ---
 
+**Kategori**
+
+**Rubrik / Kriteria Penilaian (Wajib)**
+
+---
+
 ## Domain Proyek
 
 ### Latar Belakang
@@ -51,19 +57,37 @@ Untuk mencapai tujuan tersebut, dilakukan pendekatan sebagai berikut:
 
 ### Deskripsi Dataset
 
-* Jumlah data: 545 baris
+* Jumlah data: 545 baris dan 13 kolom
 * Target: `price`
-* Beberapa fitur penting: `area`, `bedrooms`, `bathrooms`, `stories`, `parking`, `mainroad`, `airconditioning`, dll.
-* Beberapa fitur kategorikal telah diubah menggunakan one-hot encoding.
+* Sumber: [Housing Prices Dataset - Kaggle](https://www.kaggle.com/datasets/yasserh/housing-prices-dataset)
 
-### Link Dataset
+### Fitur dalam Dataset:
 
-* [Housing Prices Dataset - Kaggle](https://www.kaggle.com/datasets/yasserh/housing-prices-dataset)
+1. `price`: Harga rumah (target variabel)
+2. `area`: Luas bangunan
+3. `bedrooms`: Jumlah kamar tidur
+4. `bathrooms`: Jumlah kamar mandi
+5. `stories`: Jumlah lantai
+6. `mainroad`: Apakah rumah berada di jalan utama (yes/no)
+7. `guestroom`: Ada ruang tamu terpisah (yes/no)
+8. `basement`: Ada basement (yes/no)
+9. `hotwaterheating`: Ada pemanas air (yes/no)
+10. `airconditioning`: Ada AC (yes/no)
+11. `parking`: Jumlah tempat parkir
+12. `prefarea`: Apakah berada di area preferensi (yes/no)
+13. `furnishingstatus`: Status perabotan (furnished, semi-furnished, unfurnished)
+
+### Kondisi Data Awal:
+
+* Tidak terdapat missing values pada semua kolom.
+* Terdapat outlier pada beberapa kolom numerik seperti `price`, `area`, dan `parking`, yang ditangani dengan metode IQR capping.
+* Tidak ditemukan duplikat pada data.
 
 ### Visualisasi dan Statistik
 
-* Dilakukan distribusi awal harga rumah dan korelasi antar fitur.
-* PCA diterapkan pada fitur numerik untuk mereduksi dimensi menjadi satu fitur representatif (`housing_pca`).
+* Distribusi awal harga rumah menunjukkan skew ke kanan.
+* Korelasi fitur divisualisasikan menggunakan heatmap.
+* PCA diterapkan pada fitur numerik untuk mereduksi dimensi menjadi fitur `housing_pca`.
 
 ---
 
@@ -71,47 +95,80 @@ Untuk mencapai tujuan tersebut, dilakukan pendekatan sebagai berikut:
 
 ### Teknik yang Digunakan
 
-1. One-hot encoding pada fitur kategorikal
-2. PCA pada fitur numerik untuk ekstraksi fitur utama
-3. StandardScaler digunakan untuk melakukan standarisasi fitur numerik (`housing_pca`)
+1. **Penanganan Outlier**:
+
+   * Capping dengan IQR method pada kolom `price`, `area`, dan `parking`
+
+2. **One-hot Encoding**:
+
+   * Pada fitur kategorikal seperti `mainroad`, `guestroom`, `basement`, `furnishingstatus`, dan lain-lain
+
+3. **Penghapusan Kolom**:
+
+   * Kolom `furnishingstatus` dihapus karena dianggap redundan setelah encoding
+
+4. **PCA**:
+
+   * Diterapkan pada fitur numerik untuk menghasilkan fitur baru `housing_pca`
+
+5. **Standarisasi**:
+
+   * Menggunakan `StandardScaler` untuk menskalakan `housing_pca`
+
+6. **Pembagian Data**:
+
+   * Data dibagi menjadi data latih dan data uji menggunakan `train_test_split` dengan rasio 80:20
 
 ### Alasan
 
-* One-hot encoding diperlukan untuk mengubah variabel kategorikal menjadi bentuk numerik.
-* PCA membantu menyederhanakan fitur numerik tanpa mengorbankan informasi penting.
-* Standardisasi diperlukan agar model regresi berbasis jarak bekerja lebih optimal.
+* Outlier dapat mempengaruhi performa model, sehingga dilakukan capping.
+* Encoding dibutuhkan untuk mengubah fitur kategorikal ke bentuk numerik.
+* PCA membantu menyederhanakan fitur numerik.
+* Standarisasi penting untuk model berbasis regresi.
+* Pembagian data diperlukan untuk evaluasi model secara obyektif.
 
 ---
 
 ## Modeling
 
-### Model yang Digunakan
+### Model yang Digunakan dan Parameternya:
 
 1. **Random Forest Regressor**
 
+   * `random_state=123`
+   * Kelebihan: cepat, stabil, menangani data non-linear dengan baik
+   * Kekurangan: bisa overfitting
    * MSE: 1.78 triliun
    * R2: 0.44
+
 2. **XGBoost Regressor**
 
-   * MSE: 1.74 triliun
+   * `objective='reg:squarederror'`, `random_state=123`
+   * Kelebihan: akurasi tinggi, menangani missing value
+   * Kekurangan: waktu training relatif lebih lama
+   * MSE: 1.74 triliun (terbaik)
    * R2: 0.45 (terbaik)
+
 3. **Gradient Boosting Regressor**
 
+   * `random_state=123`
+   * Kelebihan: performa bagus pada data kompleks
+   * Kekurangan: sensitif terhadap outlier
    * MSE: 1.79 triliun
    * R2: 0.44
 
 ### Hyperparameter Tuning
 
-GridSearchCV dilakukan pada Random Forest untuk mendapatkan parameter terbaik:
+Dilakukan pada Random Forest Regressor menggunakan GridSearchCV:
 
 * Best Params: `{'n_estimators': 200, 'max_depth': 10, 'min_samples_split': 2, 'min_samples_leaf': 4, 'max_features': 'sqrt'}`
 * R2 setelah tuning (CV): 0.50
 
-### Kelebihan & Kekurangan
+### Cara Kerja Algoritma:
 
-* Random Forest: cepat dan stabil, namun bisa overfitting
-* XGBoost: akurasi tinggi, waktu training lebih lama
-* Gradient Boosting: performa bagus, tapi sensitif terhadap outlier
+* **Random Forest**: Menggabungkan banyak pohon keputusan untuk membuat prediksi rata-rata.
+* **XGBoost**: Membuat model secara bertahap dengan membetulkan error dari model sebelumnya menggunakan teknik boosting.
+* **Gradient Boosting**: Serupa dengan XGBoost, tetapi lebih sederhana dan cenderung lebih lambat.
 
 Model terbaik dipilih berdasarkan nilai MSE dan R2: **XGBoost Regressor**.
 
@@ -124,14 +181,20 @@ Model terbaik dipilih berdasarkan nilai MSE dan R2: **XGBoost Regressor**.
 1. **Mean Squared Error (MSE)**: mengukur rata-rata kuadrat error antara prediksi dan nilai asli.
 
    * Formula: $MSE = \frac{1}{n} \sum (y_i - \hat{y}_i)^2$
+
 2. **R-squared (R2)**: proporsi variansi yang dapat dijelaskan oleh model.
 
    * Formula: $R^2 = 1 - \frac{SS_{res}}{SS_{tot}}$
 
-### Hasil Evaluasi
+### Hasil Evaluasi Model
 
-* XGBoost memiliki MSE terendah (1.74T) dan R2 tertinggi (0.45)
-* Visualisasi MSE menunjukkan bahwa XGBoost lebih unggul dibanding dua model lain.
+| Model             | MSE          | R2   |
+| ----------------- | ------------ | ---- |
+| Random Forest     | 1.78 Triliun | 0.44 |
+| XGBoost           | 1.74 Triliun | 0.45 |
+| Gradient Boosting | 1.79 Triliun | 0.44 |
+
+Visualisasi MSE menunjukkan bahwa XGBoost lebih unggul dibanding dua model lain.
 
 ---
 
