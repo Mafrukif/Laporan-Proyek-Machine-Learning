@@ -105,13 +105,13 @@ Untuk mencapai tujuan tersebut, dilakukan pendekatan sebagai berikut:
 
    * Diterapkan pada fitur numerik untuk menghasilkan fitur baru `housing_pca`
 
-5. **Standarisasi**:
+5. **Pembagian Data**:
 
-   * Menggunakan `StandardScaler` untuk menskalakan `housing_pca`
+   * Data dibagi menjadi data latih dan data uji menggunakan train_test_split dengan rasio 90:10 (test_size=0.1, random_state=123).
 
-6. **Pembagian Data**:
+6. **Standarisasi**:
 
-   * Data dibagi menjadi data latih dan data uji menggunakan `train_test_split` dengan rasio 80:20
+   * Setelah pembagian data, fitur housing_pca distandarisasi secara terpisah untuk training dan testing menggunakan StandardScaler agar tidak terjadi data leakage dari data uji ke data latih.
 
 ### Alasan
 
