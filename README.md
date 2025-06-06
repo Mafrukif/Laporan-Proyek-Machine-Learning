@@ -93,13 +93,13 @@ Untuk mencapai tujuan tersebut, dilakukan pendekatan sebagai berikut:
 
    * Capping dengan IQR method pada kolom `price`, `area`, dan `parking`
 
-2. **One-hot Encoding**:
+2. **Penghapusan Kolom**:
 
-   * Pada fitur kategorikal seperti `mainroad`, `guestroom`, `basement`, `furnishingstatus`, dan lain-lain
+   * Kolom furnishingstatus dihapus sebelum proses encoding karena dianggap tidak relevan secara prediktif dan memiliki representasi yang tidak konsisten dengan fitur lainnya.
 
-3. **Penghapusan Kolom**:
+3. **One-Hot Encoding**:
 
-   * Kolom `furnishingstatus` dihapus karena dianggap redundan setelah encoding
+   * Dilakukan pada fitur kategorikal seperti mainroad, guestroom, basement, hotwaterheating, airconditioning, dan prefarea.
 
 4. **PCA**:
 
